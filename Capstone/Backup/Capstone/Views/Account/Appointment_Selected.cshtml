@@ -1,0 +1,56 @@
+﻿@model Capstone.Models.AppointmentModel
+
+@{
+ Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using WebMatrix.Data
+@using System.Data.SqlClient
+<script runat="server">
+
+</script>
+
+        @{string chosenDate = "";}
+        @{if (TempData["DatePickedModel"] != null)
+            {
+                 var datePickedModel = TempData["DatePickedModel"] as Capstone.Models.DatePickedModel;
+                 chosenDate = datePickedModel.dateSelected;
+            }
+        }
+    @{
+        var db = Database.Open("capstoneDBConnection") ; 
+        var selectQueryString = "SELECT [appointment_time], [appointment_date] FROM [appointments_table] WHERE (([appointment_date] = @0) AND ([user_num_request] IS NULL))";
+        SqlCommand sqlCommand = new SqlCommand(selectQueryString);
+        
+        var data = db.Query(selectQueryString,chosenDate); 
+        var grid = new WebGrid(data); 
+    }
+    
+
+<h2 style="text-align:center">Available Appointments</h2>
+    @using (Html.BeginForm()) {
+
+        <div style="text-align:center"> 
+             
+           <h3> Date Selected: @Html.Encode(chosenDate) </h3>
+        </div>
+        
+        <br />
+        
+        <div style="width:100%">
+            <p style="text-align:center; font-weight:bold">Select Time: @Html.DropDownListFor(m => m.ApptNum, new SelectList(ViewBag.AvailableTimes, "appointment_num", "appointment_time"), "--Times--")</p>
+        </div>
+        
+        <br />
+
+        <div style="width:100%; text-align:center">
+            <div style="font-weight:bold;"> Reason for appointment (250 character max): </div>
+            <div style="width:100%">
+                @Html.TextAreaFor(m => m.ServiceReason, new {id="appointmentReasonTextBox", @cols=20, @rows=2, style="height:72px; width:550px", @maxlength=250  })
+            </div>
+        </div>
+        
+        <div style="text-align:center">
+            <input type="submit" value="Book Appointment" />
+        </div>
+    }

@@ -1,0 +1,23 @@
+﻿@model Capstone.Models.DatePickedModel
+
+@{
+ Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Appointments</h2>
+    @using (Html.BeginForm()) {
+        <div style="margin-left:20px; text-align:center; font-weight:bold">
+            <p>*Appointments must first be approved. You can check the status of a requested appointment on your profile page.</p>
+            <p>*We do not have available appointments on weekends.</p>
+        </div>
+        <div style="float:left"> 
+            Select Date: @Html.TextBoxFor(m => m.dateSelected, new { id = "datePicker", @readonly = true})
+        </div>
+        <div style="float:left; padding-left:30px">
+        </div>
+
+        <div style="float:left; padding-left:30px; width:500px">
+            <input type="submit" value="Check Available Appointments" />
+
+        </div>
+    }

@@ -1,0 +1,48 @@
+﻿@model Capstone.Models.appointments_table
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<fieldset>
+    <legend>appointments_table</legend>
+
+    <div class="display-label">appointment_num</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.appointment_num)
+    </div>
+
+    <div class="display-label">appointment_date</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.appointment_date)
+    </div>
+
+    <div class="display-label">appointment_time</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.appointment_time)
+    </div>
+
+    <div class="display-label">users_table</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.users_table.username)
+    </div>
+
+    <div class="display-label">service_reason</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.service_reason)
+    </div>
+
+    <div class="display-label">approved</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.approved)
+    </div>
+</fieldset>
+@using (Html.BeginForm()) {
+    <p>
+        <input type="submit" value="Delete" /> |
+        @Html.ActionLink("Back to List", "Index")
+    </p>
+}

@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="capstoneModelStoreContainer" CdmEntityContainer="capstoneEntities">
+    <EntitySetMapping Name="appointments_table">
+      <EntityTypeMapping TypeName="capstoneModel.appointments_table">
+        <MappingFragment StoreEntitySet="appointments_table">
+          <ScalarProperty Name="appointment_num" ColumnName="appointment_num" />
+          <ScalarProperty Name="appointment_date" ColumnName="appointment_date" />
+          <ScalarProperty Name="appointment_time" ColumnName="appointment_time" />
+          <ScalarProperty Name="user_num_request" ColumnName="user_num_request" />
+          <ScalarProperty Name="service_reason" ColumnName="service_reason" />
+          <ScalarProperty Name="approved" ColumnName="approved" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="car_table">
+      <EntityTypeMapping TypeName="capstoneModel.car_table">
+        <MappingFragment StoreEntitySet="car_table">
+          <ScalarProperty Name="car_id" ColumnName="car_id" />
+          <ScalarProperty Name="car_year" ColumnName="car_year" />
+          <ScalarProperty Name="car_make" ColumnName="car_make" />
+          <ScalarProperty Name="car_model" ColumnName="car_model" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="cart_table">
+      <EntityTypeMapping TypeName="capstoneModel.cart_table">
+        <MappingFragment StoreEntitySet="cart_table">
+          <ScalarProperty Name="cart_name" ColumnName="cart_name" />
+          <ScalarProperty Name="cart_tied_to_user" ColumnName="cart_tied_to_user" />
+          <ScalarProperty Name="part_number" ColumnName="part_number" />
+          <ScalarProperty Name="part_quantity" ColumnName="part_quantity" />
+          <ScalarProperty Name="DateCreated" ColumnName="DateCreated" />
+          <ScalarProperty Name="cart_instance_id" ColumnName="cart_instance_id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="invoice_table">
+      <EntityTypeMapping TypeName="capstoneModel.invoice_table">
+        <MappingFragment StoreEntitySet="invoice_table">
+          <ScalarProperty Name="invoice_date" ColumnName="invoice_date" />
+          <ScalarProperty Name="invoice_num" ColumnName="invoice_num" />
+          <ScalarProperty Name="invoice_total" ColumnName="invoice_total" />
+          <ScalarProperty Name="user_num" ColumnName="user_num" />
+          <ScalarProperty Name="invoice_filled" ColumnName="invoice_filled" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="message_table">
+      <EntityTypeMapping TypeName="capstoneModel.message_table">
+        <MappingFragment StoreEntitySet="message_table">
+          <ScalarProperty Name="message_id" ColumnName="message_id" />
+          <ScalarProperty Name="created_by_user_num" ColumnName="created_by_user_num" />
+          <ScalarProperty Name="user_message" ColumnName="user_message" />
+          <ScalarProperty Name="message_time" ColumnName="message_time" />
+          <ScalarProperty Name="message_status" ColumnName="message_status" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="orders_table">
+      <EntityTypeMapping TypeName="capstoneModel.orders_table">
+        <MappingFragment StoreEntitySet="orders_table">
+          <ScalarProperty Name="order_num" ColumnName="order_num" />
+          <ScalarProperty Name="invoice_num" ColumnName="invoice_num" />
+          <ScalarProperty Name="part_num" ColumnName="part_num" />
+          <ScalarProperty Name="quantity" ColumnName="quantity" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="parts_table">
+      <EntityTypeMapping TypeName="capstoneModel.parts_table">
+        <MappingFragment StoreEntitySet="parts_table">
+          <ScalarProperty Name="part_number" ColumnName="part_number" />
+          <ScalarProperty Name="part_description" ColumnName="part_description" />
+          <ScalarProperty Name="car_id" ColumnName="car_id" />
+          <ScalarProperty Name="part_category" ColumnName="part_category" />
+          <ScalarProperty Name="part_stock" ColumnName="part_stock" />
+          <ScalarProperty Name="part_price" ColumnName="part_price" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="users_table">
+      <EntityTypeMapping TypeName="capstoneModel.users_table">
+        <MappingFragment StoreEntitySet="users_table">
+          <ScalarProperty Name="user_num" ColumnName="user_num" />
+          <ScalarProperty Name="username" ColumnName="username" />
+          <ScalarProperty Name="user_email" ColumnName="user_email" />
+          <ScalarProperty Name="first_name" ColumnName="first_name" />
+          <ScalarProperty Name="last_name" ColumnName="last_name" />
+          <ScalarProperty Name="address" ColumnName="address" />
+          <ScalarProperty Name="password" ColumnName="password" />
+          <ScalarProperty Name="car_year" ColumnName="car_year" />
+          <ScalarProperty Name="car_brand" ColumnName="car_brand" />
+          <ScalarProperty Name="car_model" ColumnName="car_model" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>

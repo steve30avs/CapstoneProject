@@ -1,0 +1,165 @@
+﻿@model dynamic
+
+@{
+ Layout = "~/Views/Shared/_Layout.cshtml";
+ ViewBag.title = "AccountOwner";
+}
+
+@using Capstone.Models
+@{capstoneEntities storeDB = new capstoneEntities();}
+
+<h2>Welcome to the owner account!</h2>
+<h3>Manage orders and appointments here. View stats and the user list with the admin account.</h3>
+
+<br />
+
+*Remember to execute the AppointmentScript.sql file in the main directory every two months to create the next two months of appointments!*
+
+  @{// Get user num
+    int usernum = 0;
+    
+    foreach (var usersItem in storeDB.users_table)
+    {
+        if (usersItem.username == HttpContext.Current.User.Identity.Name)
+        {
+            usernum = usersItem.user_num;
+        }
+    }
+ }
+    @{
+        if (TempData["messageSent"] != null)
+        {
+            @Html.Raw("<h3 style='text-decoration:underline'>");
+            @Html.Encode("*Message was sent successfully!*");
+            @Html.Raw("</h3>");
+            TempData.Clear();
+        }
+    }
+
+<h2>Personal Information</h2>
+    @{    
+    foreach(var personalItem in storeDB.users_table)
+    {
+         if (personalItem.user_num == usernum)
+         {
+                @Html.Encode("Your Unique User Num: " + personalItem.user_num)
+                @Html.Raw("<br />");
+                @Html.Encode("Your Username: " + personalItem.username)
+                @Html.Raw("<br />");
+                @Html.Raw("<br />");
+                @Html.ActionLink("Change Password/Secret Question",  "ChangePassword", "Account", new { id = personalItem.user_num }, "")
+                @Html.Raw("<br />");
+                @Html.Encode("First Name: " + personalItem.first_name)
+                @Html.Raw("<br />");
+                @Html.Encode("Last Name: " + personalItem.last_name)
+                @Html.Raw("<br />");
+                @Html.Encode("Your Car (You can select a default car on the parts page): " + personalItem.car_year + " " + personalItem.car_brand + " " + personalItem.car_model)
+                @Html.Raw("<br />");
+                @Html.ActionLink("Edit Personal Info", "GetPersonalDetails", "Account", new { id = personalItem.user_num }, "")
+         }
+    }
+}
+
+<h2>Appointment Tracker (User appointments)</h2>
+@{
+ 
+    foreach(var appointmentItem in storeDB.appointments_table)
+    {
+        // Show only approved/unapproved appointments (do not show the open/unchosen ones), must have a letter to 'exist'
+         if (appointmentItem.approved != null && appointmentItem.approved.ToLower().Contains('p'))
+         {
+                @Html.Raw("<br />");
+                @Html.Encode("Date: " + appointmentItem.appointment_date.Value.ToShortDateString() + ", Time: " + appointmentItem.appointment_time + ", User's Request: " + 
+                appointmentItem.service_reason + ", Approved by Owner: " + appointmentItem.approved)
+                @Html.ActionLink("Update Appointment Status", "GetApptDetails", "StatusAppt", new { id = appointmentItem.appointment_num }, "")
+         }
+    }
+}
+
+<h2>Appointments You Reserved</h2>
+@{
+    
+    foreach(var appointmentItem in storeDB.appointments_table)
+    {
+         if (appointmentItem.user_num_request == usernum)
+         {
+                @Html.Raw("<br />");
+                @Html.Encode("Date: " + appointmentItem.appointment_date.Value.ToShortDateString() + ", Time: " + appointmentItem.appointment_time + ", Your Request: " + 
+                appointmentItem.service_reason + ", Approved by Owner: " + appointmentItem.approved)
+         }
+    }
+}
+
+<h2>Customer Orders</h2>
+@{    
+    foreach(var invoiceItem in storeDB.invoice_table)
+    {
+         {
+                @Html.Raw("<br />");
+                @Html.Encode("Order Number: " + invoiceItem.invoice_num + ", Date: " + invoiceItem.invoice_date.Value.ToShortDateString() + ", Status: " + invoiceItem.invoice_filled + ", Update: ")
+                @Html.ActionLink("Update Invoice Status", "ChangeOrderStatus", "StatusOrder", new { id = invoiceItem.invoice_num }, "")
+         }
+    }
+}
+
+<h2>Your Orders (Parts You Reserved)</h2>
+@{    
+    foreach(var invoiceItem in storeDB.invoice_table)
+    {
+        if (invoiceItem.user_num == usernum)
+         {
+                @Html.Raw("<br />");
+                @Html.Encode("Order Num: " + invoiceItem.invoice_num + "  ---  Date: " + invoiceItem.invoice_date.Value.ToShortDateString() + "  ---  Status: " + invoiceItem.invoice_filled + "  ---  Total: $" + 
+                invoiceItem.invoice_total + "  ---  ")
+                @Html.ActionLink("View Order Details", "GetOrderDetails", "AccountOrder", new { id = invoiceItem.invoice_num }, "")
+         }
+    }
+}
+
+<h2>Unanswered User Messages</h2>
+@{    
+   
+    foreach(var messageItem in storeDB.message_table)
+    {
+        if (messageItem.message_status.Contains("Unreplied"))
+         {
+             string messageUserName = "";
+
+             foreach (var usersItem in storeDB.users_table)
+             {
+                 if (usersItem.user_num == messageItem.created_by_user_num)
+                 {
+                     messageUserName = usersItem.username;
+                 }
+             }
+            
+                @Html.Raw("<br />");
+                @Html.Encode("Message Date: " + messageItem.message_time + "  ---  From User: " + messageUserName + "  ---  Details: ")
+                @Html.ActionLink("View Message", "GetMessageDetails", "Message", new { id = messageItem.message_id }, "")
+         }
+    }
+}
+
+<h2>Previous User Messages</h2>
+@{    
+   
+    foreach(var messageItem in storeDB.message_table)
+    {
+        if (messageItem.message_status.Contains("Responded"))
+         {
+             string messageUserName = "";
+
+             foreach (var usersItem in storeDB.users_table)
+             {
+                 if (usersItem.user_num == messageItem.created_by_user_num)
+                 {
+                     messageUserName = usersItem.username;
+                 }
+             }
+            
+                @Html.Raw("<br />");
+                @Html.Encode("Message Date: " + messageItem.message_time + "  ---  From User: " + messageUserName + "  ---  Details: ")
+                @Html.ActionLink("View Message", "GetMessageDetails", "Message", new { id = messageItem.message_id }, "")
+         }
+    }
+}

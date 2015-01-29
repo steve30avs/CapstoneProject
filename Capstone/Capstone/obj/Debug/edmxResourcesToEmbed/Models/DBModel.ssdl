@@ -1,0 +1,211 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="capstoneModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityContainer Name="capstoneModelStoreContainer">
+    <EntitySet Name="appointments_table" EntityType="capstoneModel.Store.appointments_table" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="car_table" EntityType="capstoneModel.Store.car_table" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="cart_table" EntityType="capstoneModel.Store.cart_table" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="invoice_table" EntityType="capstoneModel.Store.invoice_table" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="message_table" EntityType="capstoneModel.Store.message_table" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="orders_table" EntityType="capstoneModel.Store.orders_table" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="parts_table" EntityType="capstoneModel.Store.parts_table" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="users_table" EntityType="capstoneModel.Store.users_table" store:Type="Tables" Schema="dbo" />
+    <AssociationSet Name="FK_appointments_table_users_table" Association="capstoneModel.Store.FK_appointments_table_users_table">
+      <End Role="users_table" EntitySet="users_table" />
+      <End Role="appointments_table" EntitySet="appointments_table" />
+    </AssociationSet>
+    <AssociationSet Name="FK_cart_table_parts_table" Association="capstoneModel.Store.FK_cart_table_parts_table">
+      <End Role="parts_table" EntitySet="parts_table" />
+      <End Role="cart_table" EntitySet="cart_table" />
+    </AssociationSet>
+    <AssociationSet Name="FK_invoice_table_users_table" Association="capstoneModel.Store.FK_invoice_table_users_table">
+      <End Role="users_table" EntitySet="users_table" />
+      <End Role="invoice_table" EntitySet="invoice_table" />
+    </AssociationSet>
+    <AssociationSet Name="FK_message_by_user" Association="capstoneModel.Store.FK_message_by_user">
+      <End Role="users_table" EntitySet="users_table" />
+      <End Role="message_table" EntitySet="message_table" />
+    </AssociationSet>
+    <AssociationSet Name="FK_orders_table_invoice_table" Association="capstoneModel.Store.FK_orders_table_invoice_table">
+      <End Role="invoice_table" EntitySet="invoice_table" />
+      <End Role="orders_table" EntitySet="orders_table" />
+    </AssociationSet>
+    <AssociationSet Name="FK_orders_table_orders_table" Association="capstoneModel.Store.FK_orders_table_orders_table">
+      <End Role="parts_table" EntitySet="parts_table" />
+      <End Role="orders_table" EntitySet="orders_table" />
+    </AssociationSet>
+    <AssociationSet Name="FK_parts_table_car_table" Association="capstoneModel.Store.FK_parts_table_car_table">
+      <End Role="car_table" EntitySet="car_table" />
+      <End Role="parts_table" EntitySet="parts_table" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="appointments_table">
+    <Key>
+      <PropertyRef Name="appointment_num" />
+    </Key>
+    <Property Name="appointment_num" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+    <Property Name="appointment_date" Type="date" />
+    <Property Name="appointment_time" Type="time" />
+    <Property Name="user_num_request" Type="int" />
+    <Property Name="service_reason" Type="nvarchar" MaxLength="250" />
+    <Property Name="approved" Type="nchar" MaxLength="10" />
+  </EntityType>
+  <EntityType Name="car_table">
+    <Key>
+      <PropertyRef Name="car_id" />
+    </Key>
+    <Property Name="car_id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+    <Property Name="car_year" Type="int" />
+    <Property Name="car_make" Type="varchar" MaxLength="50" />
+    <Property Name="car_model" Type="varchar" MaxLength="50" />
+  </EntityType>
+  <EntityType Name="cart_table">
+    <Key>
+      <PropertyRef Name="cart_instance_id" />
+    </Key>
+    <Property Name="cart_name" Type="varchar(max)" />
+    <Property Name="cart_tied_to_user" Type="int" />
+    <Property Name="part_number" Type="int" />
+    <Property Name="part_quantity" Type="int" />
+    <Property Name="DateCreated" Type="datetime" />
+    <Property Name="cart_instance_id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+  </EntityType>
+  <EntityType Name="invoice_table">
+    <Key>
+      <PropertyRef Name="invoice_num" />
+    </Key>
+    <Property Name="invoice_num" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+    <Property Name="invoice_total" Type="decimal" />
+    <Property Name="user_num" Type="int" />
+    <Property Name="invoice_filled" Type="nchar" MaxLength="10" />
+    <Property Name="invoice_date" Type="datetime" />
+  </EntityType>
+  <EntityType Name="message_table">
+    <Key>
+      <PropertyRef Name="message_id" />
+    </Key>
+    <Property Name="message_id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+    <Property Name="created_by_user_num" Type="int" />
+    <Property Name="user_message" Type="nvarchar(max)" />
+    <Property Name="message_time" Type="datetime" />
+    <Property Name="message_status" Type="nvarchar" MaxLength="50" />
+  </EntityType>
+  <EntityType Name="orders_table">
+    <Key>
+      <PropertyRef Name="order_num" />
+    </Key>
+    <Property Name="order_num" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+    <Property Name="invoice_num" Type="int" />
+    <Property Name="part_num" Type="int" Nullable="false" />
+    <Property Name="quantity" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="parts_table">
+    <Key>
+      <PropertyRef Name="part_number" />
+    </Key>
+    <Property Name="part_number" Type="int" Nullable="false" />
+    <Property Name="part_description" Type="nvarchar(max)" />
+    <Property Name="car_id" Type="int" />
+    <Property Name="part_category" Type="int" />
+    <Property Name="part_stock" Type="int" />
+    <Property Name="part_price" Type="float" />
+  </EntityType>
+  <EntityType Name="users_table">
+    <Key>
+      <PropertyRef Name="user_num" />
+    </Key>
+    <Property Name="user_num" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+    <Property Name="username" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="user_email" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="first_name" Type="nvarchar(max)" />
+    <Property Name="last_name" Type="nvarchar(max)" />
+    <Property Name="address" Type="nvarchar(max)" />
+    <Property Name="password" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="car_year" Type="int" />
+    <Property Name="car_brand" Type="nvarchar(max)" />
+    <Property Name="car_model" Type="nvarchar(max)" />
+  </EntityType>
+  <Association Name="FK_appointments_table_users_table">
+    <End Role="users_table" Type="capstoneModel.Store.users_table" Multiplicity="0..1" />
+    <End Role="appointments_table" Type="capstoneModel.Store.appointments_table" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="users_table">
+        <PropertyRef Name="user_num" />
+      </Principal>
+      <Dependent Role="appointments_table">
+        <PropertyRef Name="user_num_request" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_cart_table_parts_table">
+    <End Role="parts_table" Type="capstoneModel.Store.parts_table" Multiplicity="0..1" />
+    <End Role="cart_table" Type="capstoneModel.Store.cart_table" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="parts_table">
+        <PropertyRef Name="part_number" />
+      </Principal>
+      <Dependent Role="cart_table">
+        <PropertyRef Name="part_number" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_invoice_table_users_table">
+    <End Role="users_table" Type="capstoneModel.Store.users_table" Multiplicity="0..1" />
+    <End Role="invoice_table" Type="capstoneModel.Store.invoice_table" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="users_table">
+        <PropertyRef Name="user_num" />
+      </Principal>
+      <Dependent Role="invoice_table">
+        <PropertyRef Name="user_num" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_message_by_user">
+    <End Role="users_table" Type="capstoneModel.Store.users_table" Multiplicity="0..1" />
+    <End Role="message_table" Type="capstoneModel.Store.message_table" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="users_table">
+        <PropertyRef Name="user_num" />
+      </Principal>
+      <Dependent Role="message_table">
+        <PropertyRef Name="created_by_user_num" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_orders_table_invoice_table">
+    <End Role="invoice_table" Type="capstoneModel.Store.invoice_table" Multiplicity="0..1" />
+    <End Role="orders_table" Type="capstoneModel.Store.orders_table" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="invoice_table">
+        <PropertyRef Name="invoice_num" />
+      </Principal>
+      <Dependent Role="orders_table">
+        <PropertyRef Name="invoice_num" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_orders_table_orders_table">
+    <End Role="parts_table" Type="capstoneModel.Store.parts_table" Multiplicity="1" />
+    <End Role="orders_table" Type="capstoneModel.Store.orders_table" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="parts_table">
+        <PropertyRef Name="part_number" />
+      </Principal>
+      <Dependent Role="orders_table">
+        <PropertyRef Name="part_num" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_parts_table_car_table">
+    <End Role="car_table" Type="capstoneModel.Store.car_table" Multiplicity="0..1" />
+    <End Role="parts_table" Type="capstoneModel.Store.parts_table" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="car_table">
+        <PropertyRef Name="car_id" />
+      </Principal>
+      <Dependent Role="parts_table">
+        <PropertyRef Name="car_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema>

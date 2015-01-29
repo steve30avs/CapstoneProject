@@ -1,0 +1,26 @@
+﻿@model System.Web.Mvc.HandleErrorInfo
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+    <h2>
+        Sorry, an error occurred while processing your request.
+    </h2>
+    @{
+        if (Request.IsLocal)
+        {
+            if (@Model != null & @Model.Exception != null)
+            {
+                <h3>If you see the developer at some time tell him this: @Model.Exception.Message</h3>
+            }
+            else
+            {
+                <h3>No details on the error were given.</h3>
+            }
+        }
+        else
+        {
+            <h3>The error is server-related.</h3>   
+        }
+    }

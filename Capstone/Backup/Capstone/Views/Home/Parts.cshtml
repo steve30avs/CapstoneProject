@@ -1,0 +1,392 @@
+﻿@model Capstone.ViewModels.PartViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+    @{
+        if (TempData["carAdded"] != null)
+        {
+            @Html.Raw("<h3 style='text-decoration:underline'>");
+            @Html.Encode("*Car added to profile successfully!*");
+            @Html.Raw("</h3>");
+                              TempData.Clear();
+        }
+     }
+<script type="text/javascript">
+    $(document).ready(function ()
+    {
+        $("#carPartsDiv").hide();
+        $("#addCarDiv").hide();
+        $("#carDDL").change(function ()
+        {
+            var idYear = $(this).val();
+            $.getJSON("/Home/LoadMakesByYear", { id: idYear },
+            function (carData)
+            {
+                var select = $("#makeDDL");
+                select.empty();
+                select.append($('<option/>',
+                {
+                    value: 0,
+                    text: "-- Select Car Make --"
+                }));
+                $.each(carData, function (index, itemData)
+                {
+
+                    select.append($('<option/>',
+                    {
+                        value: itemData.Value,
+                        text: itemData.Text
+                    }));
+                });
+            });
+        });
+        $("#makeDDL").change(function ()
+        {
+            var idMake = $(this).val();
+            $.getJSON("/Home/LoadModelsByMake", { carMake: idMake },
+            function (modelData)
+            {
+                var select = $("#modelDDL");
+                select.empty();
+                select.append($('<option/>',
+                {
+                    value: 0,
+                    text: "-- Select Car Model --"
+                }));
+                $.each(modelData, function (index, itemData)
+                {
+
+                    select.append($('<option/>',
+                    {
+                        value: itemData.Value,
+                        text: itemData.Text
+                    }));
+                });
+            });
+        });
+        $("#modelDDL").change(function ()
+        {
+            var idModel = $(this).val();
+            $.getJSON("/Home/LoadPartsByModel", { carModelId: idModel },
+            function (carData)
+            {
+                var row = "";
+                $("#addCarDiv").show();
+                $("#defaultCarParts").hide();
+
+                var addCarLink = "<a href = " + "/Account/AddDefaultCar/" + idModel + ">Add as Default Car</a>";
+                document.getElementById('addCarDiv').innerHTML = addCarLink;
+
+                $("#carPartsDiv").show();
+                $.each(carData, function (index, itemData)
+                {
+                    if (itemData.Category == 101 && itemData.Stock > 0) {
+                        var link = "/Cart/AddToCart/" + itemData.PartNumber;
+                        row += "<tr><td>" + itemData.Description + "</td><td>" + itemData.Price + "</td><td>" + itemData.Stock + "</td><td><a href = " + link + ">Add to Cart</a></td></tr>";
+                    }
+                });
+                $("#carPartsCategory101").html(row);
+
+                var row = "";
+                $.each(carData, function (index, itemData) {
+                    if (itemData.Category == 102 && itemData.Stock > 0) {
+                        var link = "/Cart/AddToCart/" + itemData.PartNumber;
+                        row += "<tr><td>" + itemData.Description + "</td><td>" + itemData.Price + "</td><td>" + itemData.Stock + "</td><td><a href = " + link + ">Add to Cart</a></td></tr>";
+                    }
+                });
+                $("#carPartsCategory102").html(row);
+
+                var row = "";
+                $.each(carData, function (index, itemData) {
+                    if (itemData.Category == 103 && itemData.Stock > 0) {
+                        var link = "/Cart/AddToCart/" + itemData.PartNumber;
+                        row += "<tr><td>" + itemData.Description + "</td><td>" + itemData.Price + "</td><td>" + itemData.Stock + "</td><td><a href = " + link + ">Add to Cart</a></td></tr>";
+                    }
+                });
+                $("#carPartsCategory103").html(row);
+
+                var row = "";
+                $.each(carData, function (index, itemData) {
+                    if (itemData.Category == 104 && itemData.Stock > 0) {
+                        var link = "/Cart/AddToCart/" + itemData.PartNumber;
+                        row += "<tr><td>" + itemData.Description + "</td><td>" + itemData.Price + "</td><td>" + itemData.Stock + "</td><td><a href = " + link + ">Add to Cart</a></td></tr>";
+                    }
+                });
+                $("#carPartsCategory104").html(row);
+
+                var row = "";
+                $.each(carData, function (index, itemData) {
+                    if (itemData.Category == 105 && itemData.Stock > 0) {
+                        var link = "/Cart/AddToCart/" + itemData.PartNumber;
+                        row += "<tr><td>" + itemData.Description + "</td><td>" + itemData.Price + "</td><td>" + itemData.Stock + "</td><td><a href = " + link + ">Add to Cart</a></td></tr>";
+                    }
+                });
+                $("#carPartsCategory105").html(row);
+            });
+        });
+    });
+
+</script>
+
+    <form id="form1" runat="server">
+<h2>Parts selection</h2>
+        @using (Html.BeginForm("Search", "Home", FormMethod.Post))
+        {    
+         <p> Search Parts: @Html.TextBox("searchString")
+             <input type="submit" value="Search" /> </p>
+        } 
+        <h3>To view car-specific parts, you must first select a car or have a saved default.</h3>
+    
+         @Html.DropDownListFor(model => model.CarId, new SelectList(Model.CarList as System.Collections.IEnumerable, "car_year", "car_year"), "-- Select Car Year --", new { id = "carDDL" })
+         @Html.DropDownListFor(model => model.CarId, new SelectList(Enumerable.Empty<SelectListItem>(), "car_make", "car_make"), "-- Select Car Make --", new { id = "makeDDL" })
+         @Html.DropDownListFor(model => model.CarId, new SelectList(Enumerable.Empty<SelectListItem>(), "car_id", "car_model"), "-- Select Car Model --", new { id = "modelDDL" })
+         
+        <div id="defaultCarParts">
+            @{
+                Capstone.Models.capstoneEntities storeDB = new Capstone.Models.capstoneEntities();
+                if (HttpContext.Current.User.Identity.IsAuthenticated == true)
+                {
+                    var userItem = storeDB.users_table.FirstOrDefault(users_table => users_table.username == HttpContext.Current.User.Identity.Name);
+                    var userCar = storeDB.car_table.FirstOrDefault(car_table => car_table.car_make == userItem.car_brand && car_table.car_model == userItem.car_model && car_table.car_year == userItem.car_year);
+                    if (userCar != null)
+                    {
+                            <h2>Specific Parts for Your Car</h2>
+                            <h3>Air & Oil Filters</h3>
+                            <table>
+                                                <tr>
+                    <th>Part Description</th>
+                    <th>Price ($)</th>
+                    <th>Remaining Stock</th>
+                    <th>Buy</th>
+                </tr>
+                             @foreach (var item in Model.PartItems)
+                             {
+                                 if (item.part_category == 101 && item.part_stock > 0 && item.car_id == userCar.car_id)
+                                 {
+                                    <tr>
+                                        <td>@item.part_description</td>
+                                        <td>$@item.part_price</td>
+                                        <td>Stock: @item.part_stock</td>
+                                        <td>@Html.ActionLink("Add to cart", "AddToCart", "Cart", new { id = item.part_number }, "")</td>
+                                    </tr>
+                                 }
+                             }
+                             <tbody></tbody>
+                            </table>
+                            <h3>Brakes & Rotors</h3>
+                            <table>
+                                                <tr>
+                    <th>Part Description</th>
+                    <th>Price ($)</th>
+                    <th>Remaining Stock</th>
+                    <th>Buy</th>
+                </tr>
+                             @foreach (var item in Model.PartItems)
+                             {
+                                 if (item.part_category == 102 && item.part_stock > 0 && item.car_id == userCar.car_id)
+                                 {
+                                    <tr>
+                                        <td>@item.part_description</td>
+                                        <td>$@item.part_price</td>
+                                        <td>Stock: @item.part_stock</td>
+                                        <td>@Html.ActionLink("Add to cart", "AddToCart", "Cart", new { id = item.part_number }, "")</td>
+                                    </tr>
+                                 }
+                             }
+                             <tbody></tbody>
+                            </table>
+                            <h3>Bulbs & Lighting</h3>
+                            <table>
+                                                <tr>
+                    <th>Part Description</th>
+                    <th>Price ($)</th>
+                    <th>Remaining Stock</th>
+                    <th>Buy</th>
+                </tr>
+                             @foreach (var item in Model.PartItems)
+                             {
+                                 if (item.part_category == 103 && item.part_stock > 0 && item.car_id == userCar.car_id)
+                                 {
+                                    <tr>
+                                        <td>@item.part_description</td>
+                                        <td>$@item.part_price</td>
+                                        <td>Stock: @item.part_stock</td>
+                                        <td>@Html.ActionLink("Add to cart", "AddToCart", "Cart", new { id = item.part_number }, "")</td>
+                                    </tr>
+                                 }
+                             }
+                             <tbody></tbody>
+                            </table>
+                            <h3>Tires & Wheels</h3>
+                            <table>
+                                                <tr>
+                    <th>Part Description</th>
+                    <th>Price ($)</th>
+                    <th>Remaining Stock</th>
+                    <th>Buy</th>
+                </tr>
+                             @foreach (var item in Model.PartItems)
+                             {
+                                 if (item.part_category == 104 && item.part_stock > 0 && item.car_id == userCar.car_id)
+                                 {
+                                    <tr>
+                                        <td>@item.part_description</td>
+                                        <td>$@item.part_price</td>
+                                        <td>Stock: @item.part_stock</td>
+                                        <td>@Html.ActionLink("Add to cart", "AddToCart", "Cart", new { id = item.part_number }, "")</td>
+                                    </tr>
+                                 }
+                             }
+                             <tbody></tbody>
+                            </table>
+                            <h3>Wiper Blades</h3>
+                            <table>
+                                                <tr>
+                    <th>Part Description</th>
+                    <th>Price ($)</th>
+                    <th>Remaining Stock</th>
+                    <th>Buy</th>
+                </tr>
+                             @foreach (var item in Model.PartItems)
+                             {
+                                 if (item.part_category == 105 && item.part_stock > 0 && item.car_id == userCar.car_id)
+                                 {
+                                    <tr>
+                                        <td>@item.part_description</td>
+                                        <td>$@item.part_price</td>
+                                        <td>Stock: @item.part_stock</td>
+                                        <td>@Html.ActionLink("Add to cart", "AddToCart", "Cart", new { id = item.part_number }, "")</td>
+                                    </tr>
+                                 }
+                             }
+                             <tbody></tbody>
+                            </table>
+                    }
+                }
+            }
+            </div>
+        <div id ="addCarDiv" style="font-weight:bolder; font-size:large; float:right">
+            <!-- This is populated on runtime by javascript -->
+        </div>
+         <div id ="carPartsDiv">
+           <h2>Specific Parts for Your Car</h2>
+            <h3>Air & Oil Filters</h3>
+            <table>
+              <tr>
+                 <th>Part Description</th>
+                 <th>Price ($)</th>
+                 <th>Remaining Stock</th>
+                 <th>Buy</th>
+             </tr>
+             <tbody id="carPartsCategory101"></tbody>
+            </table>
+            <h3>Brakes & Rotors</h3>
+            <table>
+              <tr>
+                 <th>Part Description</th>
+                 <th>Price ($)</th>
+                 <th>Remaining Stock</th>
+                 <th>Buy</th>
+             </tr>
+             <tbody id="carPartsCategory102"></tbody>
+            </table>
+            <h3>Bulbs & Lighting</h3>
+            <table>
+              <tr>
+                 <th>Part Description</th>
+                 <th>Price ($)</th>
+                 <th>Remaining Stock</th>
+                 <th>Buy</th>
+             </tr>
+             <tbody id="carPartsCategory103"></tbody>
+            </table>
+            <h3>Tires & Wheels</h3>
+            <table>
+              <tr>
+                 <th>Part Description</th>
+                 <th>Price ($)</th>
+                 <th>Remaining Stock</th>
+                 <th>Buy</th>
+             </tr>
+             <tbody id="carPartsCategory104"></tbody>
+            </table>
+            <h3>Wiper Blades</h3>
+            <table>
+              <tr>
+                 <th>Part Description</th>
+                 <th>Price ($)</th>
+                 <th>Remaining Stock</th>
+                 <th>Buy</th>
+             </tr>
+             <tbody id="carPartsCategory105"></tbody>
+            </table>
+          </div>
+        
+<h2>General Parts and Products</h2>
+             <h3>Cleaning Products</h3>
+            <table>
+                <tr>
+                    <th>Part Description</th>
+                    <th>Price ($)</th>
+                    <th>Remaining Stock</th>
+                    <th>Buy</th>
+                </tr>
+             @foreach (var item in Model.PartItems)
+             {
+                 if (item.part_category == 201 && item.part_stock > 0)
+                 {
+                    <tr>
+                        <td>@item.part_description</td>
+                        <td>$@item.part_price</td>
+                        <td>Stock: @item.part_stock</td>
+                        <td>@Html.ActionLink("Add to cart", "AddToCart", "Cart", new { id = item.part_number }, "")</td>
+                    </tr>
+                 }
+             }
+             </table>
+             <h3>Interior Accessories</h3>
+            <table>
+                <tr>
+                    <th>Part Description</th>
+                    <th>Price ($)</th>
+                    <th>Remaining Stock</th>
+                    <th>Buy</th>
+                </tr>
+             @foreach (var item in Model.PartItems)
+             {
+                 if (item.part_category == 202 && item.part_stock > 0)
+                 {
+                    <tr>
+                        <td>@item.part_description</td>
+                        <td>$@item.part_price</td>
+                        <td>Stock: @item.part_stock</td>
+                        <td>@Html.ActionLink("Add to cart", "AddToCart", "Cart", new { id = item.part_number }, "")</td>
+                    </tr>
+                 }
+             }
+            </table>
+             <h3>Oils & Fluids</h3>
+            <table>
+                <tr>
+                    <th>Part Description</th>
+                    <th>Price ($)</th>
+                    <th>Remaining Stock</th>
+                    <th>Buy</th>
+                </tr>
+             @foreach (var item in Model.PartItems)
+             {
+                 if (item.part_category == 203 && item.part_stock > 0)
+                 {
+                    <tr>
+                        <td>@item.part_description</td>
+                        <td>$@item.part_price</td>
+                        <td>Stock: @item.part_stock</td>
+                        <td>@Html.ActionLink("Add to cart", "AddToCart", "Cart", new { id = item.part_number }, "")</td>
+                    </tr>
+                 }
+             }   
+            </table>
+
+    </form>

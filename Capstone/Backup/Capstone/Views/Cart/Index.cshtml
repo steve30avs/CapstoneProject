@@ -1,0 +1,98 @@
+﻿@model Capstone.ViewModels.CartViewModel
+
+@{
+ Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+    <script src="/Scripts/MicrosoftAjax.js" type="text/javascript"></script>
+    <script src="/Scripts/MicrosoftMvcAjax.js" type="text/javascript"></script>
+    <script src="/Scripts/jquery-1.4.1.min.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        function handleUpdate(context) {
+            // Load and deserialize the returned JSON data
+            var json = context.get_data();
+            var data = Sys.Serialization.JavaScriptSerializer.deserialize(json);
+
+            // Update the page elements
+            $('#row-' + data.DeleteId).fadeOut('slow');
+            $('#cart-status').text('Cart (' + data.CartCount + ')');
+            $('#update-message').text(data.Message);
+            $('#cart-total').text(data.CartTotal);
+        }
+    </script>
+
+    <h3>
+        <em>Review</em> your cart:
+    </h3>
+    <p class="button">
+        @{
+            TempData["currentCartModel"] = Model;
+        }
+        @* Only allow checkout if there are items in the cart *@
+        @{ if (Model.CartItems.Count > 0)
+           {
+               @Html.ActionLink("Checkout >>", "Confirmation", "Checkout");
+           }
+        }
+    </p>
+
+    <div id="update-message"></div>
+
+    <table>
+
+        <tr>
+            <th>Part Name</th>
+            <th>Price (each)</th>
+            <th>Quantity</th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model.CartItems) {
+
+               // Grab the current part info
+               Capstone.Models.parts_table partItemInCart = null;
+               
+               foreach (var partItem in Model.PartItems)
+               {
+                   if (item.part_number == partItem.part_number)
+                   {
+                       partItemInCart = partItem;
+                   }
+               }
+
+        <tr id="row-@item.cart_instance_id">
+            <td>
+                @partItemInCart.part_description
+                @*@Html.ActionLink(partItemInCart.part_description , "Details", "Store", 
+                     new { id = partItemInCart.part_number }, null)*@
+            </td>
+            <td>
+                $@partItemInCart.part_price
+            </td>
+            <td>
+                @item.part_quantity
+            </td>
+            <td>
+@*                @Ajax.ActionLink("Remove from cart", "RemoveFromCart", 
+                    "Cart", 
+                    new AjaxOptions { OnSuccess = "handleUpdate" })*@
+                @*@Html.ActionLink("Remove from cart", "RemoveFromCart", 
+                    "Cart", new { id = partItemInCart.part_number }, null)*@
+                @Ajax.ActionLink("Remove from cart", "RemoveFromCart", 
+                    new { id = item.cart_instance_id }, 
+                    new AjaxOptions { OnSuccess = "handleUpdate" })
+            </td>
+        </tr>
+        }
+
+        <tr>
+            <td>Total</td>
+            <td></td>
+            <td></td>
+            <td id="cart-total">
+                $@Model.CartTotal
+            </td>
+        </tr>
+
+    </table>

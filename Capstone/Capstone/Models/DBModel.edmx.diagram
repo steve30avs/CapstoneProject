@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="6f0241aa4ff0455289775cd75858e147" Name="Diagram1">
+        <EntityTypeShape EntityType="capstoneModel.appointments_table" Width="1.5" PointX="3" PointY="4.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="capstoneModel.car_table" Width="1.5" PointX="1.5" PointY="1.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="capstoneModel.cart_table" Width="1.5" PointX="6" PointY="4.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="capstoneModel.invoice_table" Width="1.5" PointX="3" PointY="8" IsExpanded="true" />
+        <EntityTypeShape EntityType="capstoneModel.message_table" Width="1.5" PointX="3" PointY="10.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="capstoneModel.orders_table" Width="1.5" PointX="6" PointY="7.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="capstoneModel.parts_table" Width="1.5" PointX="3.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="capstoneModel.users_table" Width="1.5" PointX="0.75" PointY="7.125" IsExpanded="true" />
+        <AssociationConnector Association="capstoneModel.FK_appointments_table_users_table" ManuallyRouted="false" />
+        <AssociationConnector Association="capstoneModel.FK_parts_table_car_table" ManuallyRouted="false" />
+        <AssociationConnector Association="capstoneModel.FK_cart_table_parts_table" ManuallyRouted="false" />
+        <AssociationConnector Association="capstoneModel.FK_invoice_table_users_table" ManuallyRouted="false" />
+        <AssociationConnector Association="capstoneModel.FK_message_by_user" ManuallyRouted="false" />
+        <AssociationConnector Association="capstoneModel.FK_orders_table_orders_table" ManuallyRouted="false" />
+        <AssociationConnector Association="capstoneModel.FK_orders_table_invoice_table" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

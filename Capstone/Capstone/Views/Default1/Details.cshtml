@@ -1,0 +1,45 @@
+﻿@model Capstone.Models.appointments_table
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<fieldset>
+    <legend>appointments_table</legend>
+
+    <div class="display-label">appointment_num</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.appointment_num)
+    </div>
+
+    <div class="display-label">appointment_date</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.appointment_date)
+    </div>
+
+    <div class="display-label">appointment_time</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.appointment_time)
+    </div>
+
+    <div class="display-label">users_table</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.users_table.username)
+    </div>
+
+    <div class="display-label">service_reason</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.service_reason)
+    </div>
+
+    <div class="display-label">approved</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.approved)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { /* id=Model.PrimaryKey */ }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

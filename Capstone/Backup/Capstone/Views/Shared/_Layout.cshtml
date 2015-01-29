@@ -1,0 +1,57 @@
+﻿<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>@RenderSection("Head", required: false)</title>
+    <link href="../../Content/site.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.8.20/themes/base/jquery-ui.css" type="text/css" media="all" />
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $("input[id$='datePicker']").datepicker({dateFormat: 'yy-mm-dd', minDate:0 }).val();
+        });
+
+    </script>
+    @RenderSection("script", required: false)
+
+</head>
+<body>
+    <div class="page">
+        <div id="header">
+            <div id="title">
+                <h1>Steveco Auto Parts &amp; Service</h1>
+            </div>
+
+            <div id="menucontainer" style="background-color:red">
+                <ul id="menu">
+                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                    <li>@Html.ActionLink("Parts Selection", "Parts", "Home")</li>
+                    <li>@Html.ActionLink("Appointments", "Appointments", "Account")</li>
+                    <li>@Html.ActionLink("Contact Us", "About", "Home")</li>
+                    <li>@Html.ActionLink("My Account", "Account", "Account")</li>
+                </ul>
+            </div>
+            <div style="text-align:left; width:50%; float:left">
+                 @if (HttpContext.Current.User.Identity.IsAuthenticated == true) {
+                     @:Welcome, @HttpContext.Current.User.Identity.Name
+                     @Html.ActionLink("Logout", "LogOff", "Account")
+                 }
+
+                @if (HttpContext.Current.User.Identity.IsAuthenticated == false) {
+                     @:You are not signed in, @Html.ActionLink("click here to sign in or register.", "LogOn", "Account")
+                }
+            </div>
+            <div style="text-align:right; width: 50%; float:left">@Html.ActionLink("View your Cart", "Index", "Cart")</div>
+        </div>
+        <div id="main">
+            @RenderBody()
+            <div id="footer">
+            </div>
+        </div>
+    </div>
+
+
+</body>
+</html>

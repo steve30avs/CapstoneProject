@@ -1,0 +1,90 @@
+﻿@model Capstone.Models.invoice_table
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using Capstone.Models
+@{capstoneEntities storeDB = new capstoneEntities();}
+
+    <script src="/Scripts/MicrosoftAjax.js" type="text/javascript"></script>
+    <script src="/Scripts/MicrosoftMvcAjax.js" type="text/javascript"></script>
+    <script src="/Scripts/jquery-1.4.1.min.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        function handleUpdate(context) {
+            // Load and deserialize the returned JSON data
+            var json = context.get_data();
+            var data = Sys.Serialization.JavaScriptSerializer.deserialize(json);
+
+            // Update the page elements
+            $('#row-' + data.DeleteId).fadeOut('slow');
+            $('#cart-status').text('Cart (' + data.CartCount + ')');
+            $('#update-message').text(data.Message);
+            $('#cart-total').text(data.CartTotal);
+        }
+    </script>
+
+    <h3>
+        Your Order Details
+    </h3>
+    <p class="button">
+    </p>
+
+    <div id="update-message"></div>
+
+    <table>
+
+        <tr>
+            <th>Part Name</th>
+            <th>Part Number</th>
+            <th>Price (each)</th>
+            <th>Quantity</th>
+            <th></th>
+        </tr>
+
+        @{
+            foreach (var orderItem in storeDB.orders_table)
+            {
+                if (orderItem.invoice_num == Model.invoice_num)
+                {
+                    string partDescription = "";
+                    double? partPrice = 0.0;
+                    
+                    foreach (var partItem in storeDB.parts_table)
+                    {
+                        if (partItem.part_number == orderItem.part_num)
+                        {
+                            partDescription = partItem.part_description;
+                            partPrice = partItem.part_price;
+                        }
+                    }
+                    @Html.Raw("<tr><td>");
+                    @Html.Encode(partDescription);
+                    @Html.Raw("</td><td>");
+                    @Html.Encode(orderItem.part_num);
+                    @Html.Raw("</td><td>$");
+                    @Html.Encode(partPrice);
+                    @Html.Raw("</td><td>");
+                    @Html.Encode(orderItem.quantity);
+                    @Html.Raw("</td></tr>");
+                }
+            }
+        }
+    </table>
+
+@{
+    // Check if status is still pending, only allow cancellation at this time
+    if (Model.invoice_filled.Contains("Pending"))
+    {
+         using (Html.BeginForm())
+         {
+             // Send off the invoice number to the controller when the user submits the form
+            @Html.HiddenFor(m => m.invoice_num);
+    
+            @Html.Raw("<br / ><div style='text-align:center'>");
+            @Html.Raw("<input type='submit' value='Cancel Order (Cannot be undone)' />");
+            @Html.Raw("</div>");
+         }
+    }
+}

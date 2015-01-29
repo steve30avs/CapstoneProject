@@ -1,0 +1,325 @@
+﻿@model Capstone.Models.message_table
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using Capstone.Models
+@{capstoneEntities storeDB = new capstoneEntities();}
+
+<script type="text/javascript">
+    $(document).ready(function ()
+    {
+        $("#AllDays").hide();
+        $("#60days").hide();
+        $("#30days").show();
+        $("#dateRangeDDL").change(function ()
+        {
+            var idRange = $(this).val();
+            if (idRange == "Last 30 days")
+            {
+                $("#AllDays").hide();
+                $("#60days").hide();
+                $("#30days").show();
+            }
+            else if (idRange == "Last 60 days")
+            {
+                $("#AllDays").hide();
+                $("#60days").show();
+                $("#30days").hide();
+            }
+            else if (idRange == "All Days")
+            {
+                $("#AllDays").show();
+                $("#60days").hide();
+                $("#30days").hide();
+            }
+        });
+    });
+
+</script>
+
+<h2>Welcome to the admin account, here you can contact users and view site statistics</h2>
+<br />
+<h2>Personal Information</h2>
+    @{    
+        int usernum = 0;
+        List<string> dateRangeList = new List<string>();
+        dateRangeList.Add("Last 30 days");
+        dateRangeList.Add("Last 60 days");
+        dateRangeList.Add("All Days");
+        
+        foreach (var usersItem in storeDB.users_table)
+        {
+            if (usersItem.username == HttpContext.Current.User.Identity.Name)
+            {
+                usernum = usersItem.user_num;
+            }
+        }
+        
+        foreach (var personalItem in storeDB.users_table)
+        {
+            if (personalItem.user_num == usernum)
+            {
+                @Html.Encode("Your Unique User Num: " + personalItem.user_num)
+                @Html.Raw("<br />");
+                @Html.Encode("Your Username: " + personalItem.username)
+                @Html.Raw("<br />");
+                @Html.Raw("<br />");
+                @Html.ActionLink("Change Password/Secret Question", "ChangePassword", "Account", new { id = personalItem.user_num }, "")
+                @Html.Raw("<br />");
+                @Html.Encode("First Name: " + personalItem.first_name)
+                @Html.Raw("<br />");
+                @Html.Encode("Last Name: " + personalItem.last_name)
+                @Html.Raw("<br />");
+                @Html.Encode("Your Car (You can select a default car on the parts page): " + personalItem.car_year + " " + personalItem.car_brand + " " + personalItem.car_model)
+                @Html.Raw("<br />");
+                @Html.ActionLink("Edit Personal Info", "GetPersonalDetails", "Account", new { id = personalItem.user_num }, "")
+            }
+        }
+    }
+
+<h2>List of Users</h2>
+@{
+        // Get user num
+
+    @Html.Raw("<table>");
+
+                        foreach (var usersItem in storeDB.users_table)
+                        {
+        @Html.Raw("<tr><td>");
+        @Html.Encode(usersItem.username);
+        @Html.Raw("</td><td>");
+        @Html.ActionLink("Email User", "GetAdminMessageWindow", "Account", new { id = usersItem.user_num }, "")
+        @Html.Raw("</td></tr>");
+                        }
+    @Html.Raw("</table>");
+    
+}
+
+<h2>Stats: </h2>
+@{
+    // Create placeholders
+    int ordersOutstanding = 0;
+    int ordersFilled = 0;
+    int apptsUpcoming = 0;
+    int apptsCompleted = 0;
+    int msgUnanswered = 0;
+    int msgAnswered = 0;
+    
+
+    @Html.Raw("<table>");
+
+                        foreach (var invoiceItem in storeDB.invoice_table)
+                        {
+                            if (invoiceItem.invoice_filled != null)
+                            {
+                                if (invoiceItem.invoice_filled.Contains("Pending"))
+                                {
+                                    ordersOutstanding = ordersOutstanding + 1;
+                                }
+                            }
+                        }
+    
+        @Html.Raw("<tr><td><p style='font-weight:bold'>Outstanding Orders:</p></td><td>");
+        @Html.Encode(ordersOutstanding);
+        @Html.Raw("</td></tr>");
+
+                               foreach (var appointmentItem in storeDB.appointments_table)
+                               {
+                                   if (appointmentItem.approved != null)
+                                   {
+                                       if (appointmentItem.approved.Contains("Pending"))
+                                       {
+                                           apptsUpcoming = apptsUpcoming + 1;
+                                       }
+                                   }
+                               }
+
+    @Html.Raw("<tr><td><p style='font-weight:bold'>Pending Appointments:</p></td><td>");
+    @Html.Encode(apptsUpcoming);
+    @Html.Raw("</td></tr>");
+
+                           foreach (var messageItem in storeDB.message_table)
+                           {
+                               if (messageItem.message_status != null)
+                               {
+                                   if (messageItem.message_status.Contains("Unreplied"))
+                                   {
+                                       msgUnanswered = msgUnanswered + 1;
+                                   }
+                               }
+                           }
+
+    @Html.Raw("<tr><td><p style='font-weight:bold'>Unanswered Messages:</p></td><td>");
+    @Html.Encode(msgUnanswered);
+    @Html.Raw("</td></tr>");
+    
+    @Html.Raw("</table>");
+    
+    @Html.Raw("<h3>Previous Stats:</h3>"); @Html.DropDownList("-- Date Range --", new SelectList(dateRangeList as System.Collections.IEnumerable), new { id = "dateRangeDDL" })
+        @Html.Raw("<div id='30days'>");
+    @Html.Raw("<table>");
+
+                        foreach (var invoiceItem in storeDB.invoice_table)
+                        {
+                            if (invoiceItem.invoice_filled != null)
+                            {
+                                TimeSpan totalDays = DateTime.Now - Convert.ToDateTime(invoiceItem.invoice_date);
+                                if (invoiceItem.invoice_filled.Contains("Ready") && totalDays.TotalDays <= 30)
+                                {
+                                    ordersFilled = ordersFilled + 1;
+                                }
+                            }
+                        }
+        @Html.Raw("<tr><td>Orders Filled:</td><td>");
+        @Html.Encode(ordersFilled);
+        @Html.Raw("</td></tr>");
+                               foreach (var appointmentItem in storeDB.appointments_table)
+                               {
+                                   if (appointmentItem.approved != null)
+                                   {
+                                       TimeSpan totalDays = DateTime.Now - Convert.ToDateTime(appointmentItem.appointment_date);
+                                       if (appointmentItem.approved.Contains("Approved") && totalDays.TotalDays <= 30)
+                                       {
+                                           apptsCompleted = apptsCompleted + 1;
+                                       }
+                                   }
+                               }
+
+    @Html.Raw("<tr><td>Booked Appointments:</td><td>");
+    @Html.Encode(apptsCompleted);
+    @Html.Raw("</td></tr>");
+
+                           foreach (var messageItem in storeDB.message_table)
+                           {
+                               if (messageItem.message_status != null)
+                               {
+                                   TimeSpan totalDays = DateTime.Now - Convert.ToDateTime(messageItem.message_time);
+                                   if (messageItem.message_status.Contains("Responded") && totalDays.TotalDays <= 30)
+                                   {
+                                       msgAnswered = msgAnswered + 1;
+                                   }
+                               }
+                           }
+    
+    @Html.Raw("<tr><td><p>Answered Messages:</p></td><td>");
+    @Html.Encode(msgAnswered);
+    @Html.Raw("</td></tr>");
+            
+    @Html.Raw("</table>");
+    @Html.Raw("</div>");
+
+    ordersFilled = 0;
+    apptsCompleted = 0;            
+    msgAnswered = 0;
+    
+    @Html.Raw("<div id='60days'>");
+    @Html.Raw("<table>");
+
+                        foreach (var invoiceItem in storeDB.invoice_table)
+                        {
+                            if (invoiceItem.invoice_filled != null)
+                            {
+                                TimeSpan totalDays = DateTime.Now - Convert.ToDateTime(invoiceItem.invoice_date);
+                                if (invoiceItem.invoice_filled.Contains("Ready") && totalDays.TotalDays <= 60)
+                                {
+                                    ordersFilled = ordersFilled + 1;
+                                }
+                            }
+                        }
+        @Html.Raw("<tr><td>Orders Filled:</td><td>");
+        @Html.Encode(ordersFilled);
+        @Html.Raw("</td></tr>");
+                               foreach (var appointmentItem in storeDB.appointments_table)
+                               {
+                                   if (appointmentItem.approved != null)
+                                   {
+                                       TimeSpan totalDays = DateTime.Now - Convert.ToDateTime(appointmentItem.appointment_date);
+                                       if (appointmentItem.approved.Contains("Approved") && totalDays.TotalDays <= 60)
+                                       {
+                                           apptsCompleted = apptsCompleted + 1;
+                                       }
+                                   }
+                               }
+
+    @Html.Raw("<tr><td>Booked Appointments:</td><td>");
+    @Html.Encode(apptsCompleted);
+    @Html.Raw("</td></tr>");
+
+                           foreach (var messageItem in storeDB.message_table)
+                           {
+                               if (messageItem.message_status != null)
+                               {
+                                   TimeSpan totalDays = DateTime.Now - Convert.ToDateTime(messageItem.message_time);
+                                   if (messageItem.message_status.Contains("Responded") && totalDays.TotalDays <= 60)
+                                   {
+                                       msgAnswered = msgAnswered + 1;
+                                   }
+                               }
+                           }
+    
+    @Html.Raw("<tr><td><p>Answered Messages:</p></td><td>");
+    @Html.Encode(msgAnswered);
+    @Html.Raw("</td></tr>");
+            
+    @Html.Raw("</table>");
+    @Html.Raw("</div>");
+
+    ordersFilled = 0;
+    apptsCompleted = 0;
+    msgAnswered = 0;
+    
+    @Html.Raw("<div id='AllDays'>");
+    @Html.Raw("<table>");
+
+                        foreach (var invoiceItem in storeDB.invoice_table)
+                        {
+                            if (invoiceItem.invoice_filled != null)
+                            {
+                                TimeSpan totalDays = DateTime.Now - Convert.ToDateTime(invoiceItem.invoice_date);
+                                if (invoiceItem.invoice_filled.Contains("Ready"))
+                                {
+                                    ordersFilled = ordersFilled + 1;
+                                }
+                            }
+                        }
+        @Html.Raw("<tr><td>Orders Filled:</td><td>");
+        @Html.Encode(ordersFilled);
+        @Html.Raw("</td></tr>");
+                               foreach (var appointmentItem in storeDB.appointments_table)
+                               {
+                                   if (appointmentItem.approved != null)
+                                   {
+                                       TimeSpan totalDays = DateTime.Now - Convert.ToDateTime(appointmentItem.appointment_date);
+                                       if (appointmentItem.approved.Contains("Approved"))
+                                       {
+                                           apptsCompleted = apptsCompleted + 1;
+                                       }
+                                   }
+                               }
+
+    @Html.Raw("<tr><td>Booked Appointments:</td><td>");
+    @Html.Encode(apptsCompleted);
+    @Html.Raw("</td></tr>");
+
+                           foreach (var messageItem in storeDB.message_table)
+                           {
+                               if (messageItem.message_status != null)
+                               {
+                                   TimeSpan totalDays = DateTime.Now - Convert.ToDateTime(messageItem.message_time);
+                                   if (messageItem.message_status.Contains("Responded"))
+                                   {
+                                       msgAnswered = msgAnswered + 1;
+                                   }
+                               }
+                           }
+    
+    @Html.Raw("<tr><td><p>Answered Messages:</p></td><td>");
+    @Html.Encode(msgAnswered);
+    @Html.Raw("</td></tr>");
+            
+    @Html.Raw("</table>");
+    @Html.Raw("</div>");
+    
+}

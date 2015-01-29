@@ -1,0 +1,101 @@
+﻿@model Capstone.Models.message_table
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using Capstone.Models
+@{capstoneEntities storeDB = new capstoneEntities();}
+
+    <script src="/Scripts/MicrosoftAjax.js" type="text/javascript"></script>
+    <script src="/Scripts/MicrosoftMvcAjax.js" type="text/javascript"></script>
+    <script src="/Scripts/jquery-1.4.1.min.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        function handleUpdate(context) {
+            // Load and deserialize the returned JSON data
+            var json = context.get_data();
+            var data = Sys.Serialization.JavaScriptSerializer.deserialize(json);
+
+            // Update the page elements
+            $('#row-' + data.DeleteId).fadeOut('slow');
+            $('#cart-status').text('Cart (' + data.CartCount + ')');
+            $('#update-message').text(data.Message);
+            $('#cart-total').text(data.CartTotal);
+        }
+    </script>
+
+    <h3>
+        Your Order Details
+    </h3>
+    <p class="button">
+    </p>
+
+    <div id="update-message"></div>
+
+    <table>
+
+        <tr>
+            <th>Username</th>
+            <th>Message Date</th>
+            <th>Message</th>
+        </tr>
+
+        @{
+            string messageUserName = "";
+              
+            foreach (var usersItem in storeDB.users_table)
+            {
+                if (usersItem.user_num == Model.created_by_user_num)
+                {
+                    messageUserName = usersItem.username;
+                }
+            }
+            
+            foreach (var messageItem in storeDB.message_table)
+            {
+                if (messageItem.message_id == Model.message_id)
+                {
+                    @Html.Raw("<tr><td>");
+                    @Html.Encode(messageUserName);
+                    @Html.Raw("</td><td>");
+                    @Html.Encode(messageItem.message_time);
+                    @Html.Raw("</td><td>");
+                    @Html.Encode(messageItem.user_message);
+                    @Html.Raw("</td></tr>");
+                }
+            }
+        }
+    </table>
+<br />
+<fieldset>
+    <legend>Reply to the user. Message will be sent to their registered email account.</legend>
+
+
+    @using (Html.BeginForm()) {
+        if (Model.message_status.Contains("Unreplied"))
+        {
+        <div style="text-align:center"> 
+            *Response will be delivered to your account and registered e-mail, 250 Character Limit.
+
+             @{Model.user_message = "";}
+             @Html.TextAreaFor(m => m.user_message, new {id = "userMessage", @cols = 100, @maxlength = 250})
+             @{Model.message_time = DateTime.Now;}
+             @Html.HiddenFor(m => m.message_id, new { id = "messageID", Value = @Model.message_id })
+             @Html.HiddenFor(m => m.created_by_user_num, new { id = "userID", Value = @Model.created_by_user_num })
+        </div>
+        
+        <div style="text-align:center">
+            <input type="submit" value="Send Message" />
+        </div>
+        }
+        else
+        {
+            <div style="text-align:center"> 
+            *You already responded! For further inquries please email the user directly.
+            </div>
+        }
+    }
+</fieldset>
+
+    

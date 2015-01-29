@@ -1,0 +1,30 @@
+﻿@{
+    ViewBag.Title = "AccountAdminMessageUser";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model Capstone.Models.message_table
+
+<h2>Admin: Send Email to User</h2>
+
+<fieldset>
+    <legend>Send a message to the user. Message will be sent to their registered email account.</legend>
+
+
+    @using (Html.BeginForm()) {
+        <div style="text-align:center"> 
+            *Response will be delivered to your account and registered e-mail, 250 Character Limit.
+
+             @{Model.user_message = "";}
+             @Html.TextAreaFor(m => m.user_message, new {id = "userMessage", @cols = 100, @maxlength = 250})
+             @{Model.message_time = DateTime.Now;}
+             @Html.HiddenFor(m => m.message_id, new { id = "messageID", Value = @Model.message_id })
+             <!--Created by user num is being used as a placeholder for the receiving user in this case-->
+             @Html.HiddenFor(m => m.created_by_user_num, new { id = "userID", Value = @Model.created_by_user_num })
+        </div>
+        
+        <div style="text-align:center">
+            <input type="submit" value="Send Message" />
+        </div>
+    }
+</fieldset>

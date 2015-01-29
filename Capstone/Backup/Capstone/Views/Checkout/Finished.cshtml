@@ -1,0 +1,11 @@
+﻿@model int
+
+@{
+    ViewBag.Title = "Finished";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Checkout Complete</h2>
+<p>Thanks for your order! Your invoice number is: @Model</p>
+<p>How about shopping for some more parts and accessories in our @Html.ActionLink("parts store.", "Index", "Home")
+</p>

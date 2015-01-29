@@ -1,0 +1,35 @@
+﻿@model List<Capstone.Models.parts_table>
+
+@{
+ Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+    @{
+        if (TempData["carAdded"] != null)
+        {
+            @Html.Raw("<h3 style='text-decoration:underline'>");
+            @Html.Encode("*Car added to profile successfully!*");
+            @Html.Raw("</h3>");
+            TempData.Clear();
+        }
+     }
+
+<h2>Search Results</h2>
+
+    <table>
+        <tr>
+            <th>Part Description</th>
+            <th>Price ($)</th>
+            <th>Remaining Stock</th>
+            <th>Buy</th>
+        </tr>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.part_description</td>
+                <td>$@item.part_price</td>
+                <td>Stock: @item.part_stock</td>
+                <td>@Html.ActionLink("Add to cart", "AddToCart", "Cart", new { id = item.part_number }, "")</td>
+            </tr>
+        }
+        </table>

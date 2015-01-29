@@ -1,0 +1,209 @@
+﻿@model Capstone.Models.message_table
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using Capstone.Models
+@{capstoneEntities storeDB = new capstoneEntities();}
+
+<script type="text/javascript">
+    $(document).ready(function ()
+    {
+        $("#90days").hide();
+        $("#60days").hide();
+        $("#30days").show();
+        $("#dateRangeDDL").change(function ()
+        {
+            var idRange = $(this).val();
+            if (idRange == "Last 30 days")
+            {
+                $("#90days").hide();
+                $("#60days").hide();
+                $("#30days").show();
+            }
+            else if (idRange == "Last 60 days")
+            {
+                $("#90days").hide();
+                $("#60days").show();
+                $("#30days").show();
+            }
+            else if (idRange == "Last 90 days")
+            {
+                $("#90days").show();
+                $("#60days").show();
+                $("#30days").show();
+            }
+        });
+    });
+
+</script>
+
+<h2>@HttpContext.Current.User.Identity.Name's Account Page</h2>
+
+  @{// Get user num
+      int usernum = 0;
+      List<string> dateRangeList = new List<string>();
+      dateRangeList.Add("Last 30 days");
+      dateRangeList.Add("Last 60 days");
+      dateRangeList.Add("Last 90 days");
+
+      foreach (var usersItem in storeDB.users_table)
+      {
+          if (usersItem.username == HttpContext.Current.User.Identity.Name)
+          {
+              usernum = usersItem.user_num;
+          }
+      }
+ }
+    @{
+        if (TempData["messageSent"] != null)
+        {
+            @Html.Raw("<h3 style='text-decoration:underline'>");
+            @Html.Encode("*Message was sent successfully!*");
+            @Html.Raw("</h3>");
+                              TempData.Clear();
+        }
+    }
+<br />
+<fieldset>
+    <legend>Personal Information</legend>
+    @{    
+        foreach (var personalItem in storeDB.users_table)
+        {
+            if (personalItem.user_num == usernum)
+            {
+                @Html.Raw("<br />");
+                @Html.Encode("Your Unique User Num: " + personalItem.user_num)
+                @Html.Raw("<br />");
+                @Html.Encode("Your Username: " + personalItem.username)
+                @Html.Raw("<br />");
+                @Html.Raw("<br />");
+                @Html.ActionLink("Change Password", "ChangePassword", "Account", new { id = personalItem.user_num }, "")
+                @Html.Raw("<br />");
+                @Html.Encode("First Name: " + personalItem.first_name)
+                @Html.Raw("<br />");
+                @Html.Encode("Last Name: " + personalItem.last_name)
+                @Html.Raw("<br />");
+                @Html.Encode("Your Car (You can select a default car on the parts page): " + personalItem.car_year + " " + personalItem.car_brand + " " + personalItem.car_model)
+                @Html.Raw("<br />");
+                @Html.ActionLink("Edit Personal Info", "GetPersonalDetails", "Account", new { id = personalItem.user_num }, "")
+            }
+        }
+}
+</fieldset>
+         
+<fieldset>
+    <legend>Appointment Information</legend>
+     <h3>Note: You can only cancel an appointment if it is still in the 'Pending' stage.</h3>
+@{    
+    foreach (var appointmentItem in storeDB.appointments_table)
+    {
+        if (appointmentItem.user_num_request == usernum && appointmentItem.approved.ToLower().Contains('p'))
+        {
+                @Html.Raw("<br />");
+                @Html.Encode("Appointment Num: " + appointmentItem.appointment_num + "  ---  Date: " + appointmentItem.appointment_date.Value.ToShortDateString() + "  ---  Time: " + appointmentItem.appointment_time + "  ---  Your Request: " +
+                appointmentItem.service_reason + "  ---  Approved by Owner: " + appointmentItem.approved + "  ---  ")
+                @Html.ActionLink("View Appointment Details", "GetAppointmentDetails", "AccountAppt", new { id = appointmentItem.appointment_num }, "")
+        }
+    }
+}
+</fieldset>
+    Recent Orders: @Html.DropDownList("-- Date Range --", new SelectList(dateRangeList as System.Collections.IEnumerable), new { id = "dateRangeDDL" })
+<fieldset>
+    <legend>Order Information</legend>
+    <h3>Note: You can only cancel an order if it is still in the 'Pending' stage.</h3>
+    <div id="90days">
+    @{    
+        foreach (var invoiceItem in storeDB.invoice_table)
+        {
+            TimeSpan totalDays = DateTime.Now - Convert.ToDateTime(invoiceItem.invoice_date);
+            if (invoiceItem.user_num == usernum && totalDays.TotalDays <= 90 && totalDays.TotalDays >= 61)
+            {
+                    @Html.Raw("<br />");
+                    if (invoiceItem.invoice_filled.ToLower().Contains("ready"))
+                    {
+                        @Html.Raw("<p style = 'font-weight:bold'>");
+                        @Html.Encode("Order Num: " + invoiceItem.invoice_num + "  ---  Date: " + invoiceItem.invoice_date.Value.ToShortDateString() + "  ---  Status: " + invoiceItem.invoice_filled + "  ---  Total: $" +
+                        invoiceItem.invoice_total + "  ---  ")
+                        @Html.Raw("</p>");
+                    }
+                    else
+                    {
+                        @Html.Encode("Order Num: " + invoiceItem.invoice_num + "  ---  Date: " + invoiceItem.invoice_date.Value.ToShortDateString() + "  ---  Status: " + invoiceItem.invoice_filled + "  ---  Total: $" +
+                        invoiceItem.invoice_total + "  ---  ")
+                    }
+                    @Html.ActionLink("View Order Details", "GetOrderDetails", "AccountOrder", new { id = invoiceItem.invoice_num }, "")
+            }
+        }
+    }
+    </div>
+    <div id="60days">
+    @{    
+        foreach (var invoiceItem in storeDB.invoice_table)
+        {
+            TimeSpan totalDays = DateTime.Now - Convert.ToDateTime(invoiceItem.invoice_date);
+            if (invoiceItem.user_num == usernum && totalDays.TotalDays <= 60 && totalDays.TotalDays >= 31)
+            {
+                    @Html.Raw("<br />");
+                    if (invoiceItem.invoice_filled.ToLower().Contains("ready"))
+                    {
+                        @Html.Raw("<p style = 'font-weight:bold'>");
+                        @Html.Encode("Order Num: " + invoiceItem.invoice_num + "  ---  Date: " + invoiceItem.invoice_date.Value.ToShortDateString() + "  ---  Status: " + invoiceItem.invoice_filled + "  ---  Total: $" +
+                        invoiceItem.invoice_total + "  ---  ")
+                        @Html.Raw("</p>");
+                    }
+                    else
+                    {
+                        @Html.Encode("Order Num: " + invoiceItem.invoice_num + "  ---  Date: " + invoiceItem.invoice_date.Value.ToShortDateString() + "  ---  Status: " + invoiceItem.invoice_filled + "  ---  Total: $" +
+                        invoiceItem.invoice_total + "  ---  ")
+                    }
+                    @Html.ActionLink("View Order Details", "GetOrderDetails", "AccountOrder", new { id = invoiceItem.invoice_num }, "")
+            }
+        }
+    }
+    </div>
+    <div id="30days">
+     @{    
+         foreach (var invoiceItem in storeDB.invoice_table)
+         {
+             TimeSpan totalDays = DateTime.Now - Convert.ToDateTime(invoiceItem.invoice_date);
+             if (invoiceItem.user_num == usernum && totalDays.TotalDays <= 30)
+             {
+                    @Html.Raw("<br />");
+                                       if (invoiceItem.invoice_filled.ToLower().Contains("ready"))
+                                       {
+                        @Html.Raw("<p style = 'font-weight:bold'>");
+                        @Html.Encode("Order Num: " + invoiceItem.invoice_num + "  ---  Date: " + invoiceItem.invoice_date.Value.ToShortDateString() + "  ---  Status: " + invoiceItem.invoice_filled + "  ---  Total: $" +
+                        invoiceItem.invoice_total + "  ---  ")
+                        @Html.Raw("</p>");
+                                       }
+                                       else
+                                       {
+                        @Html.Encode("Order Num: " + invoiceItem.invoice_num + "  ---  Date: " + invoiceItem.invoice_date.Value.ToShortDateString() + "  ---  Status: " + invoiceItem.invoice_filled + "  ---  Total: $" +
+                        invoiceItem.invoice_total + "  ---  ")
+                                       }
+                    @Html.ActionLink("View Order Details", "GetOrderDetails", "AccountOrder", new { id = invoiceItem.invoice_num }, "")
+             }
+         }
+    }
+    </div>
+</fieldset>
+
+<fieldset>
+    <legend>Ask us a Question</legend>
+    @using (Html.BeginForm())
+    {
+
+        <div style="text-align:center"> 
+            *Response will be delivered to your account and registered e-mail, 250 Character Limit.
+             @Html.TextAreaFor(m => m.user_message, new { id = "userMessage", @cols = 100, @maxlength = 250 })
+             @{Model.message_time = DateTime.Now;}
+             @Html.HiddenFor(m => m.message_time)
+        </div>
+        
+        <div style="text-align:center">
+            <input type="submit" value="Send Message" />
+        </div>
+    }
+</fieldset>
